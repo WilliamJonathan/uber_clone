@@ -68,6 +68,22 @@ class _CadastroState extends State<Cadastro> {
           .setData(usuario.toMap());
 
       //redireciona para o painel, de acordo com o tipoUsuario
+      switch(usuario.tipoUsuario){
+        case "motorista" :
+          Navigator.pushNamedAndRemoveUntil(//este método para remover rotas anteriores e não ter botão voltar na tela destino
+              context,
+              "/painel-motorista",
+              (_) => false
+          );
+          break;
+        case "passageiro" :
+          Navigator.pushNamedAndRemoveUntil(
+              context,
+              "/painel-passageiro",
+                  (_) => false
+          );
+          break;
+      }
 
     });
 
