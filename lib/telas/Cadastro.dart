@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:uber/model/Usuario.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Cadastro extends StatefulWidget {
   @override
@@ -24,7 +27,14 @@ class _CadastroState extends State<Cadastro> {
       if(email.isNotEmpty && email.contains("@")){
         if(senha.isNotEmpty && senha.length > 6){
           //se cair aqui cadastra usuario
-
+          Usuario usuario = Usuario();
+          usuario.nome = nome;
+          usuario.email = email;
+          usuario.senha = senha;
+          usuario.tipoUsuario = usuario.verificaTipoUsuario(_tipoUsuario);
+          
+          _cadastrarUsuario(usuario);
+          
         }else{
           setState(() {
             _mensagemErro = "Preencha a senha e digite mais de 6 caracteres";
@@ -40,6 +50,26 @@ class _CadastroState extends State<Cadastro> {
         _mensagemErro = "Preencha o nome";
       });
     }
+
+  }
+
+  _cadastrarUsuario(Usuario usuario){
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    Firestore db = Firestore.instance;
+    
+    auth.createUserWithEmailAndPassword(
+        email: usuario.email,
+        password: usuario.senha
+    ).then((firebaseUser){
+
+      db.collection("usuarios")
+          .document(firebaseUser.user.uid)
+          .setData(usuario.toMap());
+
+      //redireciona para o painel, de acordo com o tipoUsuario
+
+    });
 
   }
 
