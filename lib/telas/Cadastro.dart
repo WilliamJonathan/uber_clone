@@ -10,7 +10,38 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
-  bool _tipoUsuarioPassageiro = false;
+  bool _tipoUsuario = false;
+  String _mensagemErro = "";
+
+  _validarCampos(){
+    //recuperar dados dos campos
+    String nome = _controllerNome.text;
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+
+    //valida campos
+    if(nome.isNotEmpty){
+      if(email.isNotEmpty && email.contains("@")){
+        if(senha.isNotEmpty && senha.length > 6){
+          //se cair aqui cadastra usuario
+
+        }else{
+          setState(() {
+            _mensagemErro = "Preencha a senha e digite mais de 6 caracteres";
+          });
+        }
+      }else{
+        setState(() {
+          _mensagemErro = "Preencha o E-mail válido";
+        });
+      }
+    }else{
+      setState(() {
+        _mensagemErro = "Preencha o nome";
+      });
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +112,10 @@ class _CadastroState extends State<Cadastro> {
                     children: <Widget>[
                       Text("Passageiro"),
                       Switch(
-                        value: _tipoUsuarioPassageiro,
+                        value: _tipoUsuario,
                         onChanged: (bool valor){
                           setState(() {
-                            _tipoUsuarioPassageiro = valor;
+                            _tipoUsuario = valor;
                           });
                         },
                       ),
@@ -101,14 +132,16 @@ class _CadastroState extends State<Cadastro> {
                     ),
                     color: Color(0xff1ebbd8),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: (){},
+                    onPressed: (){
+                      _validarCampos();
+                    },
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
                     child: Text(
-                      "Erro",
+                      _mensagemErro,
                       style: TextStyle(color: Colors.red, fontSize: 20),
                     ),
                   ),
