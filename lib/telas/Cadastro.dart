@@ -85,6 +85,10 @@ class _CadastroState extends State<Cadastro> {
           break;
       }
 
+    }).catchError((error){
+      setState(() {
+        _mensagemErro = "Erro ao efetuar cadastro!";
+      });
     });
 
   }
