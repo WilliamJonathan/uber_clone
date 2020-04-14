@@ -19,6 +19,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   CameraPosition _posicaoCamera = CameraPosition(
   target: LatLng(-23.563999, -46.653256)
   );
+  Set<Marker> _marcadores = {};
 
   _deslogarUsuario() async {
 
@@ -58,6 +59,8 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     geolocator.getPositionStream(locationoptions).listen((Position position){
 
+      _exibeMarcadorPassageiro(position);
+
       _posicaoCamera = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
           zoom: 19
@@ -74,6 +77,9 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     setState(() {
       if(position != null){
+
+        _exibeMarcadorPassageiro(position);
+
         _posicaoCamera = CameraPosition(
             target: LatLng(position.latitude, position.longitude),
           zoom: 19
@@ -94,6 +100,32 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
           cameraPosition
       )
     );
+
+  }
+
+  _exibeMarcadorPassageiro(Position local) async{
+
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "image/passageiro.png"
+    ).then((BitmapDescriptor icone){
+
+      Marker marcadorPassageiro = Marker(
+          markerId: MarkerId("marcador-passageiro"),
+          position: LatLng(local.latitude, local.longitude),
+          infoWindow: InfoWindow(
+              title: "Meu local"
+          ),
+          icon: icone
+      );
+
+      setState(() {
+        _marcadores.add(marcadorPassageiro);
+      });
+
+    });
 
   }
 
@@ -133,8 +165,9 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
               mapType: MapType.normal,
               initialCameraPosition: _posicaoCamera,
               onMapCreated: _onMapCreated,
-              myLocationEnabled: true,
+              //myLocationEnabled: true,
               myLocationButtonEnabled: false,
+              markers: _marcadores,
             ),
             Positioned(
               top: 0,
