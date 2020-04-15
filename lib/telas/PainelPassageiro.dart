@@ -139,7 +139,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     String enderecoDestino = _controllerDestino.text;
 
-    if(enderecoDestino.isEmpty){
+    if(enderecoDestino.isNotEmpty){
 
       List<Placemark> listaEnderecos = await Geolocator()
           .placemarkFromAddress(enderecoDestino);
@@ -313,7 +313,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
                     color: Color(0xff1ebbd8),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                     onPressed: (){
-                      _chamarUber;
+                      _chamarUber();
                     },
                   ),
                 )
