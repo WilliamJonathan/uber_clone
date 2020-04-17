@@ -31,6 +31,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   target: LatLng(-23.563999, -46.653256)
   );
   Set<Marker> _marcadores = {};
+  String _idRequisicao;
 
   //controles para exibição na tela
   bool _exibirCaixaEnderecoDestino = true;
@@ -272,7 +273,21 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
   }
 
-  _cancelarUber(){
+  _cancelarUber() async{
+
+    FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+      .document(_idRequisicao).updateData({
+      "status" : StatusRequisicao.CANCELADA
+    }).then((_){
+
+      db.collection("requisicao_ativa")
+          .document(firebaseUser.uid)
+          .delete();
+
+    });
 
   }
 
@@ -296,7 +311,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
                 Map<String, dynamic> dados = snapshot.data;
                 String status = dados["status"];
-                String idRequisicao = dados["id_requisicao"];
+                _idRequisicao = dados["id_requisicao"];
 
                 switch(status){
                   case StatusRequisicao.AGUARDANDO :
