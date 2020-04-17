@@ -263,7 +263,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     _exibirCaixaEnderecoDestino = false;
 
     _alterarBotaoPrincipal(
-        "Cancelarr",
+        "Cancelar",
         Colors.red,
             (){
           _cancelarUber();
@@ -279,6 +279,45 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   _adicionarListenerRequisicaoAtiva() async{
 
     FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+
+    Firestore db = Firestore.instance;
+    await db.collection("requisicao_ativa")
+            .document(firebaseUser.uid)
+            .snapshots()
+            .listen((snapshot){
+              /*
+              * Caso exista uma requisição ativa
+              * -> altera a interface de acordo com status
+              * Caso não tenha
+              * -> exibe interface padrão para chamar o Uber
+              */
+
+              if(snapshot.data != null){
+
+                Map<String, dynamic> dados = snapshot.data;
+                String status = dados["status"];
+                String idRequisicao = dados["id_requisicao"];
+
+                switch(status){
+                  case StatusRequisicao.AGUARDANDO :
+                    _statusUberAguardando();
+                    break;
+                  case StatusRequisicao.A_CAMINHO :
+
+                    break;
+                  case StatusRequisicao.VIAGEM :
+
+                    break;
+                  case StatusRequisicao.FINALIZADA :
+
+                    break;
+                }
+
+              }else{
+                _statusUberNaoChamado();
+              }
+
+    });
 
   }
 
