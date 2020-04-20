@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uber/util/StatusRequisicao.dart';
+import 'package:uber/util/UsuarioFirebase.dart';
 
 class PainelMotorista extends StatefulWidget {
   @override
@@ -52,13 +53,45 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     
   }
 
+  _recuperaRequisicaoAtivaMotorista() async{
+
+    //recupera dados do usuario logado
+    FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+
+    //recupera requisição ativa
+    DocumentSnapshot documentSnapshot = await db
+    .collection("requisicao_ativa_motorista")
+    .document(firebaseUser.uid).get();
+
+    var dadosRequisicao = documentSnapshot.data;
+
+    if(dadosRequisicao == null){
+      _adicionaListenerRequisicoes();
+    }else{
+
+      String idRequisicao = dadosRequisicao["id_requisicao"];
+      Navigator.pushReplacementNamed(
+          context,
+          "/corrida",
+          arguments: idRequisicao
+      );
+
+    }
+
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
+    /*
+    Recupera requisição ativa para verificar se o motorista esta atendendo
+    alguma requisição e envia ele para a tela de corrida
+     */
     //adiciona listener para recuperar requisições
-    _adicionaListenerRequisicoes();
+    //_adicionaListenerRequisicoes();
+    _recuperaRequisicaoAtivaMotorista();
 
   }
 
