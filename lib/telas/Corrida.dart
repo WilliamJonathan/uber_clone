@@ -27,12 +27,15 @@ class _CorridaState extends State<Corrida> {
   );
   Set<Marker> _marcadores = {};
   Map<String, dynamic> _dadosRequisicao;
+  String _idRequisicao;
+  Position _localMotorista;
+  String _statusRequisicao = StatusRequisicao.AGUARDANDO;
 
   //controles para exibição na tela
   String _textoBotao = "Aceitar corrida";
   Color _corBotao = Color(0xff1ebbd8);
   Function _funcaoBotao;
-  String _mensagemStatus;
+  String _mensagemStatus = "";
 
   _alterarBotaoPrincipal(String texto, Color cor, Function funcao){
 
@@ -61,6 +64,23 @@ class _CorridaState extends State<Corrida> {
     geolocator.getPositionStream(locationoptions).listen((Position position){
 
       if(position != null){
+
+        if(_idRequisicao != null && _idRequisicao.isNotEmpty){
+
+          if(_statusRequisicao != StatusRequisicao.AGUARDANDO){
+            //atualiza local motorista
+            UsuarioFirebase .atualizarDadosLocalizacao(
+                _idRequisicao,
+                position.latitude,
+                position.longitude
+            );
+          }
+
+        }else if(position != null){
+          setState(() {
+            _localMotorista = position;
+          });
+        }
 
       }
     });
@@ -136,16 +156,16 @@ class _CorridaState extends State<Corrida> {
 
     String idRequisicao = _dadosRequisicao["id"];
     await db.collection("requisicoes")
-    .document(idRequisicao).snapshots().listen((snapshot){
+    .document(_idRequisicao).snapshots().listen((snapshot){
 
       if(snapshot != null){
 
         _dadosRequisicao = snapshot.data;
 
         Map<String, dynamic> dados = snapshot.data;
-        String status = dados["status"];
+        _statusRequisicao = dados["status"];
 
-        switch(status){
+        switch(_statusRequisicao){
           case StatusRequisicao.AGUARDANDO :
             _statusUberAguardando();
             break;
@@ -175,8 +195,8 @@ class _CorridaState extends State<Corrida> {
           _aceitarCorrida();
         });
 
-    double motoristaLat = _dadosRequisicao["motorista"]["latitude"];
-    double motoristaLon = _dadosRequisicao["motorista"]["longitude"];
+    double motoristaLat = _localMotorista.latitude;
+    double motoristaLon = _localMotorista.longitude;
     Position position = Position(
       latitude: motoristaLat, longitude: motoristaLon
     );
@@ -356,13 +376,13 @@ class _CorridaState extends State<Corrida> {
     // TODO: implement initState
     super.initState();
 
+    _idRequisicao = widget.idRequisicao;
+
     //adiciona listener para mudanças na requisição
     _adicionarListenerRequisicao();
 
-    _recuperarUltimaLocalicaoConhecida();
+    //_recuperarUltimaLocalicaoConhecida();
     _adicionarListenerLocalizacao();
-
-    //_recuperarRequisicao();
 
   }
 
