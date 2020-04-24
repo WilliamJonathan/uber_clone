@@ -93,7 +93,13 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
             position.longitude
         );
 
-      }else */if(position != null){
+      }else if(position != null){
+        setState(() {
+          _localPassageiro = position;
+        });
+      }*/
+      if(position != null){
+        //debugPrint("Anotacao: " + position.latitude.toString() +", "+ position.longitude.toString());
         setState(() {
           _localPassageiro = position;
         });
@@ -102,6 +108,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     });
 
   }
+
 
   _recuperarUltimaLocalicaoConhecida() async{
 
@@ -275,14 +282,16 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
           _chamarUber();
         });
 
+
     Position position = Position(
-        latitude: -25.479300,
-        longitude: -49.282729
+        latitude: _localPassageiro.latitude,
+        longitude: _localPassageiro.longitude
     );
     _exibeMarcadorPassageiro(position);
     CameraPosition cameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude), zoom: 19);
     _movimentarCamera(cameraPosition);
+    debugPrint("Ligeiro: " + position.latitude.toString() + ", " + position.longitude.toString());
 
   }
 
