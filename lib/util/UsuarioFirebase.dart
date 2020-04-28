@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uber/model/Usuario.dart';
 
-class UsuarioFirebase{
+class UsuarioFirebase {
 
   static Future<FirebaseUser> getUsuarioAtual() async {
 
@@ -19,7 +19,7 @@ class UsuarioFirebase{
     Firestore db = Firestore.instance;
 
     DocumentSnapshot snapshot = await db.collection("usuarios")
-        .document(idUsuario)
+        .document( idUsuario )
         .get();
 
     Map<String, dynamic> dados = snapshot.data;
@@ -37,16 +37,16 @@ class UsuarioFirebase{
 
   }
 
-  static atualizarDadosLocalizacao(String idRequisicao, double lat, double lon) async{
+  static atualizarDadosLocalizacao(String idRequisicao, double lat, double lon) async {
 
     Firestore db = Firestore.instance;
 
     Usuario motorista = await getDadosUsuarioLogado();
     motorista.latitude = lat;
     motorista.longitude = lon;
-    
+
     db.collection("requisicoes")
-    .document(idRequisicao)
+    .document( idRequisicao )
     .updateData({
       "motorista" : motorista.toMap()
     });

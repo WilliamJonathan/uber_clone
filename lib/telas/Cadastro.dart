@@ -10,67 +10,72 @@ class Cadastro extends StatefulWidget {
 
 class _CadastroState extends State<Cadastro> {
 
-  TextEditingController _controllerNome = TextEditingController();
-  TextEditingController _controllerEmail = TextEditingController();
-  TextEditingController _controllerSenha = TextEditingController();
+  TextEditingController _controllerNome = TextEditingController(text: "Jamilton Damasceno");
+  TextEditingController _controllerEmail = TextEditingController(text: "jamilton@gmail.com");
+  TextEditingController _controllerSenha = TextEditingController(text: "1234567");
   bool _tipoUsuario = false;
   String _mensagemErro = "";
 
   _validarCampos(){
-    //recuperar dados dos campos
+
+    //Recuperar dados dos campos
     String nome = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
 
-    //valida campos
-    if(nome.isNotEmpty){
-      if(email.isNotEmpty && email.contains("@")){
-        if(senha.isNotEmpty && senha.length > 6){
-          //se cair aqui cadastra usuario
+    //validar campos
+    if( nome.isNotEmpty ){
+
+      if( email.isNotEmpty && email.contains("@") ){
+
+        if( senha.isNotEmpty && senha.length > 6 ){
+
           Usuario usuario = Usuario();
           usuario.nome = nome;
           usuario.email = email;
           usuario.senha = senha;
           usuario.tipoUsuario = usuario.verificaTipoUsuario(_tipoUsuario);
-          
-          _cadastrarUsuario(usuario);
-          
+
+          _cadastrarUsuario( usuario );
+
         }else{
           setState(() {
-            _mensagemErro = "Preencha a senha e digite mais de 6 caracteres";
+            _mensagemErro = "Preencha a senha! digite mais de 6 caracteres";
           });
         }
+
       }else{
         setState(() {
           _mensagemErro = "Preencha o E-mail válido";
         });
       }
+
     }else{
       setState(() {
-        _mensagemErro = "Preencha o nome";
+        _mensagemErro = "Preencha o Nome";
       });
     }
 
   }
 
-  _cadastrarUsuario(Usuario usuario){
+  _cadastrarUsuario( Usuario usuario ){
 
     FirebaseAuth auth = FirebaseAuth.instance;
     Firestore db = Firestore.instance;
-    
+
     auth.createUserWithEmailAndPassword(
         email: usuario.email,
         password: usuario.senha
     ).then((firebaseUser){
 
       db.collection("usuarios")
-          .document(firebaseUser.user.uid)
-          .setData(usuario.toMap());
+          .document( firebaseUser.user.uid )
+          .setData( usuario.toMap() );
 
       //redireciona para o painel, de acordo com o tipoUsuario
-      switch(usuario.tipoUsuario){
+      switch( usuario.tipoUsuario ){
         case "motorista" :
-          Navigator.pushNamedAndRemoveUntil(//este método para remover rotas anteriores e não ter botão voltar na tela destino
+          Navigator.pushNamedAndRemoveUntil(
               context,
               "/painel-motorista",
               (_) => false
@@ -86,9 +91,7 @@ class _CadastroState extends State<Cadastro> {
       }
 
     }).catchError((error){
-      setState(() {
-        _mensagemErro = "Erro ao efetuar cadastro!";
-      });
+      _mensagemErro = "Erro ao cadastrar usuário, verifique os campos e tente novamente!";
     });
 
   }
@@ -113,7 +116,36 @@ class _CadastroState extends State<Cadastro> {
                   style: TextStyle(fontSize: 20),
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      hintText: "Nome",
+                      hintText: "Nome completo",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)
+                      )
+                  ),
+                ),
+                TextField(
+                  controller: _controllerEmail,
+                  keyboardType: TextInputType.emailAddress,
+                  style: TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      hintText: "e-mail",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)
+                      )
+                  ),
+                ),
+                TextField(
+                  controller: _controllerSenha,
+                  obscureText: true,
+                  keyboardType: TextInputType.emailAddress,
+                  style: TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      hintText: "senha",
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -122,69 +154,34 @@ class _CadastroState extends State<Cadastro> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: TextField(
-                    controller: _controllerEmail,
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "E-mail",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6)
-                        )
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: TextField(
-                    controller: _controllerSenha,
-                    obscureText: true,
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "Senha",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6)
-                        )
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 5, bottom: 10),
+                  padding: EdgeInsets.only(bottom: 10),
                   child: Row(
                     children: <Widget>[
                       Text("Passageiro"),
                       Switch(
-                        value: _tipoUsuario,
-                        onChanged: (bool valor){
-                          setState(() {
-                            _tipoUsuario = valor;
-                          });
-                        },
+                          value: _tipoUsuario,
+                          onChanged: (bool valor){
+                            setState(() {
+                              _tipoUsuario = valor;
+                            });
+                          }
                       ),
-                      Text("Motorista")
+                      Text("Motorista"),
                     ],
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 16, bottom: 10),
                   child: RaisedButton(
-                    child: Text(
-                      "Cadastrar",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    color: Color(0xff1ebbd8),
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: (){
-                      _validarCampos();
-                    },
+                      child: Text(
+                        "Cadastrar",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      color: Color(0xff1ebbd8),
+                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      onPressed: (){
+                        _validarCampos();
+                      }
                   ),
                 ),
                 Padding(

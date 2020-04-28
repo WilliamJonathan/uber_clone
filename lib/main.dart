@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uber/telas/Home.dart';
+
 import 'Rotas.dart';
 
 final ThemeData temaPadrao = ThemeData(
@@ -15,4 +16,3 @@ void main() => runApp(MaterialApp(
   onGenerateRoute: Rotas.gerarRotas,
   debugShowCheckedModeBanner: false,
 ));
-

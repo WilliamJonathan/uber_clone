@@ -11,31 +11,31 @@ class Rotas {
 
     final args = settings.arguments;
 
-    switch(settings.name){
-      case "/":
+    switch( settings.name ){
+      case "/" :
         return MaterialPageRoute(
-          builder: (_) => Home()
+            builder: (_) => Home()
         );
-      case "/cadastro":
+      case "/cadastro" :
         return MaterialPageRoute(
             builder: (_) => Cadastro()
         );
-      case "/painel-motorista":
+      case "/painel-motorista" :
         return MaterialPageRoute(
             builder: (_) => PainelMotorista()
         );
-      case "/painel-passageiro":
+      case "/painel-passageiro" :
         return MaterialPageRoute(
             builder: (_) => PainelPassageiro()
         );
-      case "/corrida":
+      case "/corrida" :
         return MaterialPageRoute(
             builder: (_) => Corrida(
-              args
+                args
             )
         );
-        default:
-          _erroRota();
+      default:
+        _erroRota();
     }
 
   }
@@ -43,14 +43,14 @@ class Rotas {
   static Route<dynamic> _erroRota(){
 
     return MaterialPageRoute(
-      builder: (_){
-        return Scaffold(
-          appBar: AppBar(title: Text("Tela não encontrada!"),),
-          body: Center(
-            child: Text("Tela não encontrada!"),
-          ),
-        );
-      }
+        builder: (_){
+          return Scaffold(
+            appBar: AppBar(title: Text("Tela não encontrada!"),),
+            body: Center(
+              child: Text("Tela não encontrada!"),
+            ),
+          );
+        }
     );
 
   }

@@ -16,26 +16,28 @@ class _HomeState extends State<Home> {
   bool _carregando = false;
 
   _validarCampos(){
-    //recuperar dados dos campos
+
+    //Recuperar dados dos campos
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
 
-    //valida campos
-    if(email.isNotEmpty && email.contains("@")){
-      if(senha.isNotEmpty && senha.length > 6){
-        //se cair aqui cadastra usuario
+    //validar campos
+    if( email.isNotEmpty && email.contains("@") ){
+
+      if( senha.isNotEmpty && senha.length > 6 ){
+
         Usuario usuario = Usuario();
         usuario.email = email;
         usuario.senha = senha;
 
-        //logar usuario
-        _logarUsuario(usuario);
+        _logarUsuario( usuario );
 
       }else{
         setState(() {
-          _mensagemErro = "Preencha a senha e digite mais de 6 caracteres";
+          _mensagemErro = "Preencha a senha! digite mais de 6 caracteres";
         });
       }
+
     }else{
       setState(() {
         _mensagemErro = "Preencha o E-mail válido";
@@ -44,7 +46,7 @@ class _HomeState extends State<Home> {
 
   }
 
-  _logarUsuario(Usuario usuario){
+  _logarUsuario( Usuario usuario ){
 
     setState(() {
       _carregando = true;
@@ -57,62 +59,57 @@ class _HomeState extends State<Home> {
         password: usuario.senha
     ).then((firebaseUser){
 
-      _redirecionaPainelPorTipoUsuario(firebaseUser.user.uid);
-      
+      _redirecionaPainelPorTipoUsuario( firebaseUser.user.uid );
+
     }).catchError((error){
-      setState(() {
-        _carregando = false;
-        _mensagemErro = "Erro ao logar usuario, verifique o e-mail e senha";
-      });
+      _mensagemErro = "Erro ao autenticar usuário, verifique e-mail e senha e tente novamente!";
     });
 
   }
 
-  _redirecionaPainelPorTipoUsuario(String idUsuario) async{
+  _redirecionaPainelPorTipoUsuario(String idUsuario) async {
 
     Firestore db = Firestore.instance;
 
     DocumentSnapshot snapshot = await db.collection("usuarios")
-          .document(idUsuario)
+          .document( idUsuario )
           .get();
+
     Map<String, dynamic> dados = snapshot.data;
-    String tipoUsurio = dados["tipoUsuario"];
+    String tipoUsuario = dados["tipoUsuario"];
 
     setState(() {
       _carregando = false;
     });
 
-    switch(tipoUsurio){
-      case "motorista":
+    switch( tipoUsuario ){
+      case "motorista" :
         Navigator.pushReplacementNamed(context, "/painel-motorista");
         break;
-      case "passageiro":
+      case "passageiro" :
         Navigator.pushReplacementNamed(context, "/painel-passageiro");
         break;
     }
 
   }
 
-  //Verifica se usuario já esta logado
-
-  _verificaUsuarioLogado() async {
+  _verificarUsuarioLogado() async {
 
     FirebaseAuth auth = FirebaseAuth.instance;
 
     FirebaseUser usuarioLogado = await auth.currentUser();
-    if(usuarioLogado != null){
+    if( usuarioLogado != null ){
       String idUsuario = usuarioLogado.uid;
       _redirecionaPainelPorTipoUsuario(idUsuario);
     }
-
 
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _verificaUsuarioLogado();
+    _verificarUsuarioLogado();
+
   }
 
   @override
@@ -121,8 +118,8 @@ class _HomeState extends State<Home> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("image/fundo.png"),
-            fit: BoxFit.cover
+              image: AssetImage("imagens/fundo.png"),
+              fit: BoxFit.cover
           )
         ),
         padding: EdgeInsets.all(16),
@@ -134,7 +131,7 @@ class _HomeState extends State<Home> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 32),
                   child: Image.asset(
-                      "image/logo.png",
+                      "imagens/logo.png",
                     width: 200,
                     height: 150,
                   ),
@@ -145,31 +142,28 @@ class _HomeState extends State<Home> {
                   keyboardType: TextInputType.emailAddress,
                   style: TextStyle(fontSize: 20),
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    hintText: "E-mail",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6)
-                    )
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      hintText: "e-mail",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)
+                      )
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: TextField(
-                    controller: _controllerSenha,
-                    obscureText: true,
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "Senha",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6)
-                        )
-                    ),
+                TextField(
+                  controller: _controllerSenha,
+                  obscureText: true,
+                  keyboardType: TextInputType.emailAddress,
+                  style: TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      hintText: "senha",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)
+                      )
                   ),
                 ),
                 Padding(
@@ -179,17 +173,17 @@ class _HomeState extends State<Home> {
                         "Entrar",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Color(0xff1ebbd8),
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: (){
-                      _validarCampos();
-                    },
+                      color: Color(0xff1ebbd8),
+                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      onPressed: (){
+                        _validarCampos();
+                      }
                   ),
                 ),
                 Center(
                   child: GestureDetector(
                     child: Text(
-                        "Não tem conta? Cadastre-se!",
+                        "Não tem conta? cadastre-se!",
                       style: TextStyle(color: Colors.white),
                     ),
                     onTap: (){
@@ -198,10 +192,8 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 _carregando
-                ? Center(
-                  child: CircularProgressIndicator(backgroundColor: Colors.white,),
-                )
-                : Container(),
+                    ? Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                    : Container(),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(

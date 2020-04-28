@@ -1,8 +1,9 @@
-import 'package:uber/model/Destino.dart';
-import 'package:uber/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'Destino.dart';
+import 'Usuario.dart';
 
-class Requisicao{
+class Requisicao {
+
   String _id;
   String _status;
   Usuario _passageiro;
@@ -12,21 +13,21 @@ class Requisicao{
   Requisicao(){
 
     Firestore db = Firestore.instance;
-
+    
     DocumentReference ref = db.collection("requisicoes").document();
     this.id = ref.documentID;
-
+    
   }
 
   Map<String, dynamic> toMap(){
 
     Map<String, dynamic> dadosPassageiro = {
-      "nome" : this.passageiro.nome,
-      "email" : this.passageiro.email,
-      "tipoUsuario" : this.passageiro.tipoUsuario,
-      "idUsuario" : this.passageiro.idUsuario,
-      "latitude" : this.passageiro.latitude,
-      "longitude" : this.passageiro.longitude,
+    "nome" : this.passageiro.nome,
+    "email" : this.passageiro.email,
+    "tipoUsuario" : this.passageiro.tipoUsuario,
+    "idUsuario" : this.passageiro.idUsuario,
+    "latitude" : this.passageiro.latitude,
+    "longitude" : this.passageiro.longitude,
     };
 
     Map<String, dynamic> dadosDestino = {
@@ -45,7 +46,9 @@ class Requisicao{
       "motorista" : null,
       "destino" : dadosDestino,
     };
+
     return dadosRequisicao;
+
   }
 
   Destino get destino => _destino;

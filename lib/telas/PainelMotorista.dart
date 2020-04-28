@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,7 +16,6 @@ class _PainelMotoristaState extends State<PainelMotorista> {
   List<String> itensMenu = [
     "Configurações", "Deslogar"
   ];
-
   final _controller = StreamController<QuerySnapshot>.broadcast();
   Firestore db = Firestore.instance;
 
@@ -28,9 +28,9 @@ class _PainelMotoristaState extends State<PainelMotorista> {
 
   }
 
-  _escolhaItemMenu(String escolha){
+  _escolhaMenuItem( String escolha ){
 
-    switch(escolha){
+    switch( escolha ){
       case "Deslogar" :
         _deslogarUsuario();
         break;
@@ -40,33 +40,33 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     }
 
   }
+  
+  Stream<QuerySnapshot> _adicionarListenerRequisicoes(){
 
-  Stream<QuerySnapshot> _adicionaListenerRequisicoes(){
-    
-    final stream =  db.collection("requisicoes")
-        .where("status", isEqualTo: StatusRequisicao.AGUARDANDO)
+    final stream = db.collection("requisicoes")
+        .where("status", isEqualTo: StatusRequisicao.AGUARDANDO )
         .snapshots();
 
     stream.listen((dados){
-      _controller.add(dados);
+      _controller.add( dados );
     });
     
   }
 
-  _recuperaRequisicaoAtivaMotorista() async{
+  _recuperaRequisicaoAtivaMotorista() async {
 
-    //recupera dados do usuario logado
+    //Recupera dados do usuario logado
     FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
 
-    //recupera requisição ativa
+    //Recupera requisicao ativa
     DocumentSnapshot documentSnapshot = await db
-    .collection("requisicao_ativa_motorista")
-    .document(firebaseUser.uid).get();
+        .collection("requisicao_ativa_motorista")
+        .document( firebaseUser.uid ).get();
 
     var dadosRequisicao = documentSnapshot.data;
 
-    if(dadosRequisicao == null){
-      _adicionaListenerRequisicoes();
+    if( dadosRequisicao == null ){
+      _adicionarListenerRequisicoes();
     }else{
 
       String idRequisicao = dadosRequisicao["id_requisicao"];
@@ -79,20 +79,17 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     }
 
   }
-
+  
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     /*
-    Recupera requisição ativa para verificar se o motorista esta atendendo
-    alguma requisição e envia ele para a tela de corrida
-     */
-    //adiciona listener para recuperar requisições
-    //_adicionaListenerRequisicoes();
+    Recupera requisicao ativa para verificar se motorista está
+    atendendo alguma requisição e envia ele para tela de corrida
+    */
     _recuperaRequisicaoAtivaMotorista();
-
+    
   }
 
   @override
@@ -101,7 +98,7 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     var mensagemCarregando = Center(
       child: Column(
         children: <Widget>[
-          Text("Carregando requisições..."),
+          Text("Carregando requisições"),
           CircularProgressIndicator()
         ],
       ),
@@ -111,9 +108,9 @@ class _PainelMotoristaState extends State<PainelMotorista> {
       child: Text(
         "Você não tem nenhuma requisição :( ",
         style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold
-        )
+            fontSize: 18,
+            fontWeight: FontWeight.bold
+        ),
       ),
     );
 
@@ -122,14 +119,16 @@ class _PainelMotoristaState extends State<PainelMotorista> {
         title: Text("Painel motorista"),
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: _escolhaItemMenu,
+            onSelected: _escolhaMenuItem,
             itemBuilder: (context){
 
               return itensMenu.map((String item){
+
                 return PopupMenuItem<String>(
                   value: item,
                   child: Text(item),
                 );
+
               }).toList();
 
             },
@@ -137,63 +136,63 @@ class _PainelMotoristaState extends State<PainelMotorista> {
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _controller.stream,
-        builder: (context, snapshot){
-          switch(snapshot.connectionState){
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-              return mensagemCarregando;
-              break;
-            case ConnectionState.active:
-            case ConnectionState.done:
+          stream: _controller.stream,
+          builder: (context, snapshot){
+            switch( snapshot.connectionState ){
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return mensagemCarregando;
+                break;
+              case ConnectionState.active:
+              case ConnectionState.done:
 
-              if(snapshot.hasError){
-                return Text("Erro ao carregar os dados!");
-              }else{
+                if( snapshot.hasError ){
+                  return Text("Erro ao carregar os dados!");
+                }else {
 
-                QuerySnapshot querySnapshot = snapshot.data;
-                if(querySnapshot.documents.length == 0){
-                  return mensagemNaoTemDados;
-                }else{
+                  QuerySnapshot querySnapshot = snapshot.data;
+                  if( querySnapshot.documents.length == 0 ){
+                    return mensagemNaoTemDados;
+                  }else{
 
-                  return ListView.separated(
-                      itemCount: querySnapshot.documents.length,
-                      separatorBuilder: (context, indice) => Divider(
-                        height: 2,
-                        color: Colors.grey,
-                      ),
-                      itemBuilder: (context, indice){
+                    return ListView.separated(
+                        itemCount: querySnapshot.documents.length,
+                        separatorBuilder: (context, indice) => Divider(
+                          height: 2,
+                          color: Colors.grey,
+                        ),
+                        itemBuilder: (context, indice){
 
-                        List<DocumentSnapshot> requisicoes = querySnapshot.documents.toList();
-                        DocumentSnapshot item = requisicoes[indice];
+                          List<DocumentSnapshot> requisicoes = querySnapshot.documents.toList();
+                          DocumentSnapshot item = requisicoes[ indice ];
 
-                        String idRequisicao = item["id"];
-                        String nomePassageiro = item["passageiro"]["nome"];
-                        String rua = item["destino"]["rua"];
-                        String numero = item["destino"]["numero"];
+                          String idRequisicao = item["id"];
+                          String nomePassageiro = item["passageiro"]["nome"];
+                          String rua = item["destino"]["rua"];
+                          String numero = item["destino"]["numero"];
+                          
+                          return ListTile(
+                            title: Text( nomePassageiro ),
+                            subtitle: Text("destino: $rua, $numero"),
+                            onTap: (){
+                              Navigator.pushNamed(
+                                  context,
+                                  "/corrida",
+                                arguments: idRequisicao
+                              );
+                            },
+                          );
 
-                        return ListTile(
-                          title: Text(nomePassageiro),
-                          subtitle: Text("destino: $rua, $numero"),
-                          onTap: (){
-                            Navigator.pushNamed(
-                                context,
-                                "/corrida",
-                              arguments: idRequisicao
-                            );
-                          },
-                        );
+                        }
+                    );
 
-                      }
-                  );
+                  }
 
                 }
 
-              }
-
-              break;
+                break;
+            }
           }
-        },
       ),
     );
   }
