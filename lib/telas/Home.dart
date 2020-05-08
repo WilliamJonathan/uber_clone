@@ -10,8 +10,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  TextEditingController _controllerEmail = TextEditingController();
-  TextEditingController _controllerSenha = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController(text: "teste@teste.com");
+  TextEditingController _controllerSenha = TextEditingController(text: "1234567");
   String _mensagemErro = "";
   bool _carregando = false;
 

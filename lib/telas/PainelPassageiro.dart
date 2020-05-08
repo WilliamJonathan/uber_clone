@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:uber/model/Destino.dart';
 import 'package:uber/model/Requisicao.dart';
 import 'package:uber/model/Usuario.dart';
+import 'package:uber/util/Global.dart';
 import 'package:uber/util/StatusRequisicao.dart';
 import 'package:uber/util/UsuarioFirebase.dart';
 
@@ -18,6 +19,7 @@ class PainelPassageiro extends StatefulWidget {
 }
 
 class _PainelPassageiroState extends State<PainelPassageiro> {
+  Position localPassageiro;
   TextEditingController _controllerDestino =
       TextEditingController(text: "av. paulista, 807");
   List<String> itensMenu = ["Configurações", "Deslogar"];
@@ -74,7 +76,14 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
       }else if( position != null ){
         setState(() {
-          _localPassageiro = position;
+         //_localPassageiro = position;
+         _mostraLocalPassageiroPeloPosition(positionJ: position);
+         //Global().localUsuario = position;
+
+          //Global(position);
+          Global global = Global(position);
+         // global.global(position: position);
+          print("Ligeiro: " + global.localUsuario.toString());
         });
       }
 
@@ -125,6 +134,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   }
 
   _chamarUber() async {
+    
     String enderecoDestino = _controllerDestino.text;
 
     if (enderecoDestino.isNotEmpty) {
@@ -236,6 +246,22 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     });
   }
 
+  _mostraLocalPassageiroPeloPosition({Position positionJ}){
+
+    _localPassageiro = positionJ;
+    Position position = Position(
+        latitude: _localPassageiro.latitude,
+        longitude: _localPassageiro.longitude
+    );
+    //print("uberP " + position.latitude.toString() + ", " +  position.longitude.toString());
+    _exibirMarcadorPassageiro(position);
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude), zoom: 19);
+    _movimentarCamera( cameraPosition );
+
+  }
+
+
   _statusUberNaoChamado() {
     _exibirCaixaEnderecoDestino = true;
 
@@ -243,7 +269,10 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
       _chamarUber();
     });
 
-    Position position = Position(
+    Global global;
+    print("Lerdo:" + global.localUsuario.toString());
+
+    /*Position position = Position(
       latitude: _localPassageiro.latitude,
       longitude: _localPassageiro.longitude
     );
@@ -251,7 +280,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     _exibirMarcadorPassageiro(position);
     CameraPosition cameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude), zoom: 19);
-    _movimentarCamera( cameraPosition );
+    _movimentarCamera( cameraPosition );*/
 
   }
 
@@ -486,7 +515,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
               right: 0,
               left: 0,
               bottom: 0,
-              child: Padding(
+              child:  Padding(
                 padding: Platform.isIOS
                     ? EdgeInsets.fromLTRB(20, 10, 20, 25)
                     : EdgeInsets.all(10),
